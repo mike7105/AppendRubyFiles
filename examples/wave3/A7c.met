@@ -1,0 +1,19 @@
+[Codeframes]
+(A7c)
+1=Avon
+2=Cherny Zhemchug
+3=Faberlic
+4=Garnier
+5=L'Oreal
+6=Mary Kay
+7=Maybelline
+8=Nivea
+9=Oriflame
+10=Yves Rocher
+998=None of these
+()
+[Metadata]
+Base0=cwf
+Desc=Brands purchased in past 12 months
+DataMJD=0
+DataType=Number
