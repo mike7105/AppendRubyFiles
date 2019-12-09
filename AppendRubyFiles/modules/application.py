@@ -10,7 +10,8 @@ import threading
 import queue
 import glob
 import shutil
-import pickle
+import json
+
 
 class Application(ttk.Frame):
     """класс для отрисовки AppendRubyFiles"""
@@ -19,10 +20,12 @@ class Application(ttk.Frame):
         self.master = master
         self.version = version
         self.grid_params = {"padx": 5, "pady": 5}
-        self.grid(row=0, column=0, columnspan=2, sticky="wnse", **self.grid_params)
+        self.grid(row=0, column=0, columnspan=2, sticky="wnse",
+                  **self.grid_params)
 
         self.frame1 = ttk.Frame()
-        self.frame1.grid(row=0, column=0, columnspan=2, sticky="wnse", **self.grid_params)
+        self.frame1.grid(row=0, column=0, columnspan=2, sticky="wnse",
+                         **self.grid_params)
 
         # ButtonRun
         self.btn_run = ttk.Button(text="Run", command=self.run_append)
@@ -41,7 +44,8 @@ class Application(ttk.Frame):
         # LabelStatus
         self.var_status = tk.StringVar()
         self.var_status.set("")
-        self.lbl_status = ttk.Label(textvariable=self.var_status, relief=tk.RIDGE)
+        self.lbl_status = ttk.Label(textvariable=self.var_status,
+                                    relief=tk.RIDGE)
         self.lbl_status.grid(row=3, column=0, columnspan=2, sticky="wes")
 
         # Sizegrip
@@ -53,7 +57,7 @@ class Application(ttk.Frame):
         self.master.grid_columnconfigure(1, weight=1)
 
         self.master.title("AppendRubyFiles")
-        self.master.minsize(width=400, height=300)
+        self.master.minsize(width=500, height=300)
 
         self.create_menu()
         self.create_widgets()
@@ -84,17 +88,20 @@ class Application(ttk.Frame):
         self.filemenu = tk.Menu(self.mainmenu, tearoff=False)
 
         self.filemenu.add_command(
-            label="Open settings", accelerator="Ctrl+O", command=self.open_settings)
+            label="Open settings", accelerator="Ctrl+O",
+            command=self.open_settings)
         self.bind_all("<Control-KeyPress-o>", self.open_settings)
 
         self.filemenu.add_command(
-            label="Save settings", accelerator="Ctrl+S", command=self.save_settings)
+            label="Save settings", accelerator="Ctrl+S",
+            command=self.save_settings)
         self.bind_all("<Control-KeyPress-s>", self.save_settings)
 
         self.filemenu.add_separator()
 
         self.filemenu.add_command(
-            label="Exit", accelerator="Ctrl+Q", command=self.master.destroy)
+            label="Exit", accelerator="Ctrl+Q",
+            command=self.master.destroy)
         self.bind_all(
             "<Control-KeyPress-q>", lambda evt: self.btn_exit.invoke())
 
@@ -106,7 +113,8 @@ class Application(ttk.Frame):
         self.them = tk.StringVar()
         self.them.set("vista")
         self.tharr = [
-            "default", "winnative", "clam", "alt", "classic", "vista", "xpnative"]
+            "default", "winnative", "clam", "alt",
+            "classic", "vista", "xpnative"]
 
         for style in self.tharr:
             self.thememenu.add_radiobutton(
@@ -129,7 +137,8 @@ class Application(ttk.Frame):
         self.elems = []
 
         # LabelPrev
-        self.lbl_prev = ttk.Label(self.frame1, text="Choose Casedata from previous waves:")
+        self.lbl_prev = ttk.Label(self.frame1,
+                                  text="Choose Casedata from previous waves:")
         self.lbl_prev.grid(
             row=0, column=0, columnspan=2, sticky="we", **self.grid_params)
 
@@ -139,18 +148,21 @@ class Application(ttk.Frame):
         self.ent_prev = ttk.Entry(self.frame1, textvariable=self.var_prev)
         # self.ent_prev.state(["disabled"])
         self.ent_prev.bind(
-            "<Button-3>", lambda evt, obj=self.var_prev: self.show_menu(evt, obj))
+                "<Button-3>",
+                lambda evt, obj=self.var_prev: self.show_menu(evt, obj))
         self.ent_prev.grid(row=1, column=0, sticky="we", **self.grid_params)
         self.elems.append(self.ent_prev)
 
         # ButtonPrev
-        self.btn_prev = ttk.Button(self.frame1, text="Choose...",
-                                   command=lambda: self.open_dir(self.var_prev))
+        self.btn_prev = ttk.Button(
+                self.frame1, text="Choose...",
+                command=lambda: self.open_dir(self.var_prev))
         self.btn_prev.grid(row=1, column=1, sticky="e", **self.grid_params)
         self.elems.append(self.btn_prev)
 
         # LabelCurr
-        self.lbl_curr = ttk.Label(self.frame1, text="Choose Casedata from last wave:")
+        self.lbl_curr = ttk.Label(self.frame1,
+                                  text="Choose Casedata from last wave:")
         self.lbl_curr.grid(
             row=2, column=0, columnspan=2, sticky="we", **self.grid_params)
 
@@ -160,18 +172,21 @@ class Application(ttk.Frame):
         self.ent_curr = ttk.Entry(self.frame1, textvariable=self.var_curr)
         # self.ent_curr.state(["disabled"])
         self.ent_curr.bind(
-            "<Button-3>", lambda evt, obj=self.var_curr: self.show_menu(evt, obj))
+            "<Button-3>",
+            lambda evt, obj=self.var_curr: self.show_menu(evt, obj))
         self.ent_curr.grid(row=3, column=0, sticky="we", **self.grid_params)
         self.elems.append(self.ent_curr)
 
         # ButtonCurr
-        self.btn_curr = ttk.Button(self.frame1, text="Choose...",
-                                   command=lambda: self.open_dir(self.var_curr))
+        self.btn_curr = ttk.Button(
+                self.frame1, text="Choose...",
+                command=lambda: self.open_dir(self.var_curr))
         self.btn_curr.grid(row=3, column=1, sticky="e", **self.grid_params)
         self.elems.append(self.btn_curr)
 
         # LabelRes
-        self.lbl_res = ttk.Label(self.frame1, text="Choose Casedata for appended waves:")
+        self.lbl_res = ttk.Label(self.frame1,
+                                 text="Choose Casedata for appended waves:")
         self.lbl_res.grid(
             row=4, column=0, columnspan=2, sticky="we", **self.grid_params)
 
@@ -181,7 +196,8 @@ class Application(ttk.Frame):
         self.ent_res = ttk.Entry(self.frame1, textvariable=self.var_res)
         # self.ent_res.state(["disabled"])
         self.ent_res.bind(
-            "<Button-3>", lambda evt, obj=self.var_curr: self.show_menu(evt, obj))
+            "<Button-3>",
+            lambda evt, obj=self.var_curr: self.show_menu(evt, obj))
         self.ent_res.grid(row=5, column=0, sticky="we", **self.grid_params)
         self.elems.append(self.ent_res)
 
@@ -215,7 +231,8 @@ class Application(ttk.Frame):
             self.pgb["maximum"] = len(self.cd_files)
 
             if os.path.exists(os.path.join(self.var_prev.get(), "id.cd")):
-                self.num_prev = self.count_lines(os.path.join(self.var_prev.get(), "id.cd"))
+                self.num_prev = self.count_lines(
+                        os.path.join(self.var_prev.get(), "id.cd"))
 
             self.var_status.set("copy cd files")
             self.lbl_status.update()
@@ -231,7 +248,7 @@ class Application(ttk.Frame):
             quant_bariers = len(self.cd_files)
             quant_bariers = 500 if quant_bariers > 500 else quant_bariers
             self.barrier = threading.Barrier(quant_bariers)
-            for i in range(0, quant_bariers-1):
+            for i in range(0, quant_bariers):
                 thr = threading.Thread(target=self.run_append_th)
                 threads.append(thr)
                 thr.start()
@@ -246,7 +263,8 @@ class Application(ttk.Frame):
         local = threading.local()
         while not self.que.empty():
             local.cd_file_c = self.que.get()
-            local.cd_file_p = os.path.join(self.var_prev.get(), os.path.split(local.cd_file_c)[1])
+            local.cd_file_p = os.path.join(self.var_prev.get(),
+                                           os.path.split(local.cd_file_c)[1])
 
             # если в self.var_prev есть такой же файл, то его копирую и
             # дописываю содержимым файла из self.var_curr
@@ -255,21 +273,24 @@ class Application(ttk.Frame):
                 if self.num_prev == 0:
                     self.num_prev = self.count_lines(local.cd_file_p)
 
-                local.cd_file_r = shutil.copy(local.cd_file_p, self.var_res.get())
+                local.cd_file_r = shutil.copy(local.cd_file_p,
+                                              self.var_res.get())
 
                 with open(local.cd_file_c, 'rb') as local.fsrc:
                     with open(local.cd_file_r, 'ab') as local.fdst:
                         shutil.copyfileobj(local.fsrc, local.fdst)
                         with self.lock:
-                            self.var_status.set(os.path.basename(local.cd_file_r))
+                            self.var_status.set(
+                                    os.path.basename(local.cd_file_r))
                             self.lbl_status.update()
                             self.pgb.step()
 
-            # если файла нет, то нужно создать пустой с определенным кол-вом строк
+            # если файла нет, то создать пустой с определенным кол-вом строк
             else:
                 self.num_new += 1
-                local.cd_file_r = os.path.join(self.var_res.get(),
-                                               os.path.split(local.cd_file_c)[1])
+                local.cd_file_r = os.path.join(
+                        self.var_res.get(),
+                        os.path.split(local.cd_file_c)[1])
 
                 with open(local.cd_file_r, 'w') as local.f:
                     local.f.write('\n' * self.num_prev)
@@ -278,7 +299,8 @@ class Application(ttk.Frame):
                     with open(local.cd_file_r, 'ab') as local.fdst:
                         shutil.copyfileobj(local.fsrc, local.fdst)
                         with self.lock:
-                            self.var_status.set(os.path.basename(local.cd_file_r))
+                            self.var_status.set(
+                                    os.path.basename(local.cd_file_r))
                             self.lbl_status.update()
                             self.pgb.step()
 
@@ -290,12 +312,13 @@ class Application(ttk.Frame):
         self.barrier.wait()
         self.time_end = time.time()
         self.time_dur = self.time_end - self.time_start
-        self.var_status.set("same files {0}; new files {1}; duration {2:.3f}".format(
-            self.num_same, self.num_new, self.time_dur))
+        self.var_status.set(
+                "same files {0}; new files {1}; duration {2:.3f}".format(
+                        self.num_same, self.num_new, self.time_dur))
         self.lbl_status.update()
         self.change_state(True)
 
-    def count_lines(self, filename, chunk_size=1<<13):
+    def count_lines(self, filename, chunk_size=1 << 13):
         """считает кол-во строк в файле"""
         with open(filename) as file:
             chunk = '\n'
@@ -315,9 +338,11 @@ class Application(ttk.Frame):
 
     def show_info(self):
         """Показ информации"""
-        msgbox.showinfo("О программе...", """{0}
-        © Михаил Чесноков, 2019 г.
-        mailto: Mihail.Chesnokov@ipsos.com""".format(self.version), parent=self)
+        msgbox.showinfo(
+                "О программе...",
+                """{0}\n© Михаил Чесноков, 2019 г.
+mailto: Mihail.Chesnokov@ipsos.com""".format(self.version),
+                parent=self)
 
     def show_menu(self, evt, obj):
         """Показывает контекстное меню"""
@@ -375,13 +400,13 @@ class Application(ttk.Frame):
         """Считывание сохраненных ранее параметров"""
         filename = tkFD.askopenfilename(
             title="Open settings",
-            filetypes=(("Settings", "TXT"),))
+            filetypes=(("Settings", "JSON"),))
         if filename:
-            with open(filename, "rb") as fln:
-                obj = pickle.load(fln)
-                self.var_prev.set(obj[0])
-                self.var_curr.set(obj[1])
-                self.var_res.set(obj[2])
+            with open(filename, "r") as fln:
+                obj = json.load(fln)
+                self.var_prev.set(obj['prev'])
+                self.var_curr.set(obj['curr'])
+                self.var_res.set(obj['res'])
         else:
             msgbox.showerror(
                 title="settings", message="File wasn't chosen!")
@@ -389,12 +414,15 @@ class Application(ttk.Frame):
     def save_settings(self, evt=None):
         """Сохранение введенных параметров"""
         filename = tkFD.asksaveasfilename(
-            title="Save settings", filetypes=(("Settings", "TXT"),))
+            title="Save settings", filetypes=(("Settings", "JSON"),))
         if filename:
-            with open(filename + ".txt", "wb") as fln:
-                obj = [self.var_prev.get(), self.var_curr.get(), self.var_res.get()]
-                pickle.dump(obj, fln)
+            with open(filename + ".json", "w") as fln:
+                obj = {'prev':self.var_prev.get(), 'curr':self.var_curr.get(),
+                       'res':self.var_res.get()}
+                json.dump(obj, fln)
         else:
             msgbox.showerror("settings", "File wasn't chosen!")
+
+
 if __name__ == "__main__":
     pass
