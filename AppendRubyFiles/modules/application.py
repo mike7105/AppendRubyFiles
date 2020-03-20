@@ -230,9 +230,9 @@ class Application(ttk.Frame):
             self.cd_files = glob.glob(self.var_curr.get() + "\\*.cd")
             self.pgb["maximum"] = len(self.cd_files)
 
-            if os.path.exists(os.path.join(self.var_prev.get(), "id.cd")):
+            if os.path.exists(os.path.join(self.var_prev.get(), "TOTAL.cd")):
                 self.num_prev = self.count_lines(
-                        os.path.join(self.var_prev.get(), "id.cd"))
+                        os.path.join(self.var_prev.get(), "TOTAL.cd"))
 
             self.var_status.set("copy cd files")
             self.lbl_status.update()
