@@ -4,9 +4,9 @@ block_cipher = None
 
 
 a = Analysis(['AppendRubyFiles.pyw'],
-             pathex=['O:\\Progs\\Python\\AppendRubyFiles\\AppendRubyFiles'],
+             pathex=['O:\\Progs\\Python\\AppendRubyFiles'],
              binaries=[],
-             datas=[],
+             datas=[('modules/ico', 'modules/ico')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
