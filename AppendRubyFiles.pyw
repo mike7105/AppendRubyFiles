@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 """AppendRubyFiles start"""
-__version__ = 'Version:1.4'
-import traceback
+__version__ = 'Version:1.5'
+
+import sys
 import tkinter as tk
 import tkinter.messagebox as msgbox
+import traceback
+
 from modules.application import Application, resource_path
 
 
@@ -15,8 +18,10 @@ try:
     ROOT.mainloop()
 except Exception as e:
     trace_inf = traceback.format_exc()
-    print("Unexpected error:", trace_inf)  # sys.exc_info()[0])
+    print(e)
+    print("Unexpected error:", trace_inf)
     msgbox.showinfo("Unexpected error:", trace_inf)
-    # sys.exc_info()[0], parent=ROOT)
-# finally:
+    ROOT.destroy()
+finally:
+    sys.exit()
     # input("Нажмите для выхода...")

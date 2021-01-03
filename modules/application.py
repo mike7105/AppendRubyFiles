@@ -114,15 +114,15 @@ class Application(ttk.Frame):
         self.mainmenu.add_cascade(label="File", menu=self.filemenu)
 
         # Добавляем меню Настройки в главное меню
-        self.thememenu = tk.Menu(self.mainmenu, tearoff=False)
+        # self.thememenu = tk.Menu(self.mainmenu, tearoff=False)
 
-        self.them = tk.StringVar()
-        self.them.set("vista")
-        self.tharr = ["default", "winnative", "clam", "alt", "classic", "vista", "xpnative"]
+        # self.them = tk.StringVar()
+        # self.them.set("vista")
+        # self.tharr = ["default", "winnative", "clam", "alt", "classic", "vista", "xpnative"]
 
-        for style in self.tharr:
-            self.thememenu.add_radiobutton(label=style, variable=self.them, value=style, command=self.change_theme)
-        self.mainmenu.add_cascade(label="Theme", menu=self.thememenu)
+        # for style in self.tharr:
+        #     self.thememenu.add_radiobutton(label=style, variable=self.them, value=style, command=self.change_theme)
+        # self.mainmenu.add_cascade(label="Theme", menu=self.thememenu)
 
         # Создаем подменю Справка
         self.helpmenu = tk.Menu(self.mainmenu, tearoff=False)
@@ -228,14 +228,21 @@ class Application(ttk.Frame):
                 self.que.put(cd_file_c)
 
             # запуская многопоточное дозаписывание файлов
-            quant_bariers = len(self.cd_files)
+            quant_bariers = len(self.cd_files) // 2
             quant_bariers = 500 if quant_bariers > 500 else quant_bariers
             self.barrier = threading.Barrier(quant_bariers)
+            self.threads = []
             for i in range(0, quant_bariers):
                 thr = threading.Thread(target=self.run_append_th)
+                self.threads.append(thr)
                 thr.start()
+
             thr = threading.Thread(target=self.thread_end)
+            self.threads.append(thr)
             thr.start()
+            # self.barrier.wait()
+            print(self.threads)
+
         else:
             self.change_state(True)
 
@@ -255,14 +262,6 @@ class Application(ttk.Frame):
 
                 local.cd_file_r = shutil.copy(local.cd_file_p, self.var_res.get())
 
-                with open(local.cd_file_c, 'rb') as local.fsrc:
-                    with open(local.cd_file_r, 'ab') as local.fdst:
-                        shutil.copyfileobj(local.fsrc, local.fdst)
-                        with self.lock:
-                            self.var_status.set(os.path.basename(local.cd_file_r))
-                            self.lbl_status.update()
-                            self.pgb.step()
-
             # если файла нет, то создать пустой с определенным кол-вом строк
             else:
                 self.num_new += 1
@@ -271,13 +270,13 @@ class Application(ttk.Frame):
                 with open(local.cd_file_r, 'w') as local.f:
                     local.f.write('\n' * self.num_prev)
 
-                with open(local.cd_file_c, 'rb') as local.fsrc:
-                    with open(local.cd_file_r, 'ab') as local.fdst:
-                        shutil.copyfileobj(local.fsrc, local.fdst)
-                        with self.lock:
-                            self.var_status.set(os.path.basename(local.cd_file_r))
-                            self.lbl_status.update()
-                            self.pgb.step()
+            with open(local.cd_file_c, 'rb') as local.fsrc:
+                with open(local.cd_file_r, 'ab') as local.fdst:
+                    shutil.copyfileobj(local.fsrc, local.fdst)
+                    with self.lock:
+                        self.var_status.set(os.path.basename(local.cd_file_r))
+                        self.lbl_status.update()
+                        self.pgb.step()
 
             self.que.task_done()
         self.barrier.wait()
@@ -285,11 +284,16 @@ class Application(ttk.Frame):
     def thread_end(self):
         """Функция для завершающего потока"""
         self.barrier.wait()
+        # self.barrier.reset()
         self.time_end = time.time()
         self.time_dur = self.time_end - self.time_start
-        self.var_status.set(f"same files {self.num_same}; new files {self.num_new}; duration {self.time_dur:.3f}")
+        self.status = f"same files {self.num_same}; new files {self.num_new}; duration {self.time_dur:.3f}"
+        msgbox.showinfo("Results:", self.status)
+        self.var_status.set(self.status)
         self.lbl_status.update()
         self.change_state(True)
+        self.barrier.reset()
+        self.barrier.abort()
 
     def open_dir(self, obj):
         """Выбор директории"""
@@ -316,9 +320,9 @@ mailto: Mihail.Chesnokov@ipsos.com""", parent=self)
         self.clipboard_clear()
         self.clipboard_append(self.to_copy)
 
-    def change_theme(self):
-        """меняет внешний вид при выборе встроенных тем"""
-        self.style.theme_use(self.them.get())
+    # def change_theme(self):
+    #     """меняет внешний вид при выборе встроенных тем"""
+    #     self.style.theme_use(self.them.get())
 
     def validate(self) -> bool:
         """проверка введенных значений"""

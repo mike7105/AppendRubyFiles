@@ -1,6 +1,8 @@
-*idea*
-*__pycache__*
-*build*
+.idea
+__pycache__*
+/build/
 *.vs*
-*wave1-3*
 *.spec
+/examples/wave1-2/
+/examples/wave1-3/
+/examples/wave3/
