@@ -6,3 +6,4 @@ __pycache__*
 /examples/wave1-2/
 /examples/wave1-3/
 /examples/wave3/
+*.pem
